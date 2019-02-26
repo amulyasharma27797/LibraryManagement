@@ -3,50 +3,50 @@ from db import *
 
 #Functions for choosing the desired options
 
-#Adding a user
+#1. Adding a user
 def add_user():
     add = add_rem_User()
     add.addUser()
 
-#Adding a new book
+#2. Adding a new book
 def add_book():
     add = add_rem_Book()
     add.addBook()
 
-#Search for a book
+#3. Search for a book
 def srch_book():
     srch = display()
     srch.search()
 
-#Issue a book to an existing member
+#4. Issue a book to an existing member
 def issue_book():
     issueBook()
 
-#Accepting the book
+#5. Accepting the book
 def accept_book():
     acceptBook()
 
-#Display issuing history
+#6. Display issuing history
 def hist():
     disp = display()
     disp.get_hist()
 
-#Display details of book
+#7. Display details of book
 def details_books():
     disp = display()
     disp.show_db_books()
 
-#Display details of user
+#8. Display details of user
 def details_user():
     disp = display()
     disp.show_db_users()
 
-#Remove a user
+#9. Remove a user
 def rem_user():
     rem = add_rem_User()
     rem.remUser()
 
-#Remove a book
+#10. Remove a book
 def rem_book():
     rem = add_rem_Book()
     rem.remBook()
