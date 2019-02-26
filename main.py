@@ -1,14 +1,17 @@
-from db import show_db
+from db import * 
+# show_db_books, add_rem_Book
 
 #Functions for choosing the desired options
 
 #Adding a user
 def add_user():
-    pass
+    add = add_rem_User()
+    add.addUser()
 
 #Adding a new book
 def add_book():
-    pass 
+    add = add_rem_Book()
+    add.addBook()
 
 #Search for a book
 def srch_book():
@@ -27,8 +30,24 @@ def hist():
     pass
 
 #Display details of book
-def details():
-    print(show_db())
+def details_books():
+    disp = display()
+    disp.show_db_books()
+
+#Display details of user
+def details_user():
+    disp = display()
+    disp.show_db_users()
+
+#Remove a user
+def rem_user():
+    rem = add_rem_User()
+    rem.remUser()
+
+#Remove a book
+def rem_book():
+    rem = add_rem_Book()
+    rem.remBook()
 
 #Incorrect Input
 def default():
@@ -41,15 +60,15 @@ options = {
     4:issue_book,
     5:accept_book,
     6:hist,
-    7:details
+    7:details_books,
+    8:details_user, 
+    9:rem_user,
+    10:rem_book
 }
 
 def switch(opt):
-    print("in switch")
-    
     o = options.get(opt, default)
     o()
-    
     
 
 
@@ -67,7 +86,9 @@ while inp == 'y':
     print("5. Accept returned book from member")
     print("6. Display issuing history of members")
     print("7. Display details of books in database")
-
+    print("8. Display details of users in database")
+    print("9. Remove a user")
+    print("10. Remove a book")
     #Getting input from the user
     print("\nPress the desired option please :\n")
 
