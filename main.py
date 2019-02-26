@@ -15,19 +15,21 @@ def add_book():
 
 #Search for a book
 def srch_book():
-    pass
+    srch = display()
+    srch.search()
 
 #Issue a book to an existing member
 def issue_book():
-    pass
+    issueBook()
 
 #Accepting the book
 def accept_book():
-    pass
+    acceptBook()
 
 #Display issuing history
 def hist():
-    pass
+    disp = display()
+    disp.get_hist()
 
 #Display details of book
 def details_books():
@@ -71,8 +73,6 @@ def switch(opt):
     o()
     
 
-
-
 #Various options of Library Management shown on Command Line when program starts
 
 inp = 'y'
@@ -89,10 +89,10 @@ while inp == 'y':
     print("8. Display details of users in database")
     print("9. Remove a user")
     print("10. Remove a book")
+   
     #Getting input from the user
     print("\nPress the desired option please :\n")
 
     opt = int(input())
     switch(opt)
     inp = input("Do you wish to continue? (y/n) : ")
-

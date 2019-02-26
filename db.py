@@ -3,8 +3,37 @@ import mysql.connector
 mydb = mysql.connector.connect(host="127.0.0.1", user="root", passwd="password", database="lms")
 mycursor = mydb.cursor()
 
+
+def issueBook():
+   isbn = int(input("Enter the ISBN of the book : "))
+   user_id = str(input("Enter the id of the user :  "))
+
+   query = ("insert into history(isbn, userid) values(%s, %s)")
+   val = (isbn, user_id)
+
+   mycursor.execute(query, val)
+   mydb.commit()
+
+   print(mycursor.rowcount, "Book issued")
+
+
+def acceptBook():
+   isbn = int(input("Enter the ISBN of the book : "))
+   user_id = str(input("Enter the id of the user :  "))
+
+   query = ("delete from history where isbn = %s and userid = %s")
+   val = (isbn, user_id)
+
+   mycursor.execute(query, val)
+   mydb.commit()
+
+   print(mycursor.rowcount, "Book accepted")
+
+
 # 1&9 Add and Remove a user
 class add_rem_User:
+    
+    #Function for adding a user 
     def addUser(self):
         usr_id = int(input("Enter id :"))
         name = str(input("Enter the name :"))
@@ -20,7 +49,7 @@ class add_rem_User:
 
         print(mycursor.rowcount, "New user added")
 
-
+    #Function for removing a user
     def remUser(self):
         usr_id = int(input("Enter the id of the user :"))
 
@@ -37,6 +66,8 @@ class add_rem_User:
 
 # 2&10 Add and Remove a book
 class add_rem_Book:
+
+    #Function for adding a book
     def addBook(self):
         book_id = int(input("Enter the book id : "))
         name = str(input("Enter the name of the book :"))
@@ -53,6 +84,7 @@ class add_rem_Book:
 
         print(mycursor.rowcount, "Record Inserted")
 
+    #Function for removing a book
     def remBook(self):
         isbn = int(input("Enter the isbn of book to be removed :"))
         
@@ -67,21 +99,76 @@ class add_rem_Book:
 
 
 
-# 7&8 Display Details of Books Available
+# 3 & 7 & 8 Display Details of Books Available
 class display:
 
+    #Function for displaying whole book database
     def show_db_books(self):
 
-        mycursor.execute("select * from books")
+        mycursor.execute("select * from books order by book_id asc")
 
         myresult = mycursor.fetchall()
 
         for book in myresult:
             print(book)
 
+
+    #Function for displaying whole user database
     def show_db_users(self):
 
         mycursor.execute("select * from user")
+
+        myresult = mycursor.fetchall()
+
+        for user in myresult:
+            print(user)
+
+
+    #Function for searching the books in database
+    def search(self):
+        def book_name():
+            bookName = str(input("Enter the name of the book : "))
+            query = ("select * from books where name = %s")
+            val = (bookName,)
+
+            mycursor.execute(query, val)
+            myresult = mycursor.fetchall()
+
+            for book in myresult:
+                print(book)
+
+        def isbn():
+            number = int(input("Enter the isbn number :"))
+            query = ("select * from books where isbn = %s")
+            val = (number,)
+
+            mycursor.execute(query, val)
+            myresult = mycursor.fetchall()
+
+            for book in myresult:
+                print(book)
+
+        def default():
+            print("Enter a valid option please")
+
+        book_dict = {1:book_name, 2:isbn}
+
+        def switch(get_inp):
+            opt = book_dict.get(get_inp, default)
+            opt()
+
+        print("Search a Book\n")
+        print("1. Search by Book Name")
+        print("2. Search by ISBN\n")
+        print("Enter your choice : \n")
+
+
+        get_inp = int(input())
+        switch(get_inp)
+
+    #Function for getting history of all members in the databse
+    def get_hist(self):
+        mycursor.execute("select * from history")
 
         myresult = mycursor.fetchall()
 
