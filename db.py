@@ -33,7 +33,7 @@ def acceptBook():
 # 1&9 Add and Remove a user
 class add_rem_User:
     
-    #Function for adding a user 
+    #1. Function for adding a user 
     def addUser(self):
         usr_id = int(input("Enter id :"))
         name = str(input("Enter the name :"))
@@ -49,7 +49,7 @@ class add_rem_User:
 
         print(mycursor.rowcount, "New user added")
 
-    #Function for removing a user
+    #9. Function for removing a user
     def remUser(self):
         usr_id = int(input("Enter the id of the user :"))
 
@@ -67,7 +67,7 @@ class add_rem_User:
 # 2&10 Add and Remove a book
 class add_rem_Book:
 
-    #Function for adding a book
+    #2. Function for adding a book
     def addBook(self):
         book_id = int(input("Enter the book id : "))
         name = str(input("Enter the name of the book :"))
@@ -84,7 +84,7 @@ class add_rem_Book:
 
         print(mycursor.rowcount, "Record Inserted")
 
-    #Function for removing a book
+    #10. Function for removing a book
     def remBook(self):
         isbn = int(input("Enter the isbn of book to be removed :"))
         
@@ -99,32 +99,10 @@ class add_rem_Book:
 
 
 
-# 3 & 7 & 8 Display Details of Books Available
+# 3 & 6 & 7 & 8 Display Details
 class display:
 
-    #Function for displaying whole book database
-    def show_db_books(self):
-
-        mycursor.execute("select * from books order by book_id asc")
-
-        myresult = mycursor.fetchall()
-
-        for book in myresult:
-            print(book)
-
-
-    #Function for displaying whole user database
-    def show_db_users(self):
-
-        mycursor.execute("select * from user")
-
-        myresult = mycursor.fetchall()
-
-        for user in myresult:
-            print(user)
-
-
-    #Function for searching the books in database
+    #3. Function for searching the books in database
     def search(self):
         def book_name():
             bookName = str(input("Enter the name of the book : "))
@@ -166,9 +144,31 @@ class display:
         get_inp = int(input())
         switch(get_inp)
 
-    #Function for getting history of all members in the databse
+    #6. Function for getting history of all members in the databse
     def get_hist(self):
         mycursor.execute("select * from history")
+
+        myresult = mycursor.fetchall()
+
+        for user in myresult:
+            print(user)
+
+
+    #7. Function for displaying whole book database
+    def show_db_books(self):
+
+        mycursor.execute("select * from books order by book_id asc")
+
+        myresult = mycursor.fetchall()
+
+        for book in myresult:
+            print(book)
+
+
+    #8. Function for displaying whole user database
+    def show_db_users(self):
+
+        mycursor.execute("select * from user")
 
         myresult = mycursor.fetchall()
 
