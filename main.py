@@ -1,5 +1,4 @@
-from db import * 
-# show_db_books, add_rem_Book
+from db import *
 
 #Functions for choosing the desired options
 
@@ -20,11 +19,13 @@ def srch_book():
 
 #4. Issue a book to an existing member
 def issue_book():
-    issueBook()
+    issue = transaction()
+    issue.issueBook()
 
 #5. Accepting the book
 def accept_book():
-    acceptBook()
+    accept = transaction()
+    accept.acceptBook()
 
 #6. Display issuing history
 def hist():
