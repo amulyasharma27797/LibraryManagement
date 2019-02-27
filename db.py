@@ -1,68 +1,90 @@
 from datetime import datetime, timedelta
 import mysql.connector
 
+
+#Connecting program and database
 mydb = mysql.connector.connect(host="127.0.0.1", user="root", passwd="password", database="lms")
 mycursor = mydb.cursor()
 
-# global due 
+
+# global due for getting due date
 due = datetime.now().date() + timedelta(days=7)
 
 
 #4 & 5 Issue and Accept a Book
 class transaction():
-    # global due 
+
     #Issuing a book   
     def issueBook(self):
-        isbn = int(input("Enter the ISBN of the book : "))
+        print("\nMaximum number of books issued to a user is 5.\n")
         user_id = str(input("Enter the id of the user :  "))
-        issue = datetime.now().date()
         
-        # global due 
-        # due = datetime.now().date() + timedelta(days=7)
-
-        #Getting and updating count of books available in the database
-        query0 = ("select books_count from books where isbn = %s")
-        val0 = (isbn,)
-        mycursor.execute(query0, val0)
+        query = ("select book_count from user where id = %s")
+        val = (user_id,)
+        mycursor.execute(query, val)
         myresult = mycursor.fetchall()
         get_count = myresult[0][0]
-        # print(get_count)
-        if get_count > 0:
-            get_count = get_count - 1 
-            query = ("update books set books_count = %s where isbn = %s")
-            val = (get_count,isbn)
+
+        print("\nNumber of books issued to this user is : %d" %get_count)
+
+        #Checks whether user have issued more than 5 books or not
+        if get_count < 5:
+            
+            isbn = int(input("\nEnter the ISBN of the book : "))
+
+            issue = datetime.now().date()
+
+            print()
+            print(str(isbn) + " : " + str(issue))
+            print()
+           
+            #Increasing and updating the book count in the user table
+            query= ("select book_count from user where id = %s")
+            val = (user_id,)
+            mycursor.execute(query, val)
+            myresult = mycursor.fetchall()
+            get_count = myresult[0][0]
+
+            get_count = get_count + 1 
+            query = ("update user set book_count = %s where id = %s")
+            val = (get_count, user_id)
             mycursor.execute(query, val)
             mydb.commit()
+                        
+            #Getting and updating count of books available in the book table
+            query = ("select books_count from books where isbn = %s")
+            val = (isbn,)
+            mycursor.execute(query, val)
+            myresult = mycursor.fetchall()
+            get_count = myresult[0][0]
+            #print(get_count)
+            if get_count > 0:
+                get_count = get_count - 1 
+                query = ("update books set books_count = %s where isbn = %s")
+                val = (get_count,isbn)
+                mycursor.execute(query, val)
+                mydb.commit()
+            else:
+                print("\nBook not available\n")
+
+            #Issuing the book to the user and maintaining the log
+            query = ("insert into history(isbn, userid, issue_date, due_date) values(%s, %s, %s, %s)")
+            val = (isbn, user_id, issue, due)
+
+            mycursor.execute(query, val)
+            mydb.commit()
+
+            print(mycursor.rowcount, "Book issued")
+
         else:
-            print("Book not available")
-
-        #Issuing the book to the user and maintaining the log
-        query = ("insert into history(isbn, userid, issue_date, due_date) values(%s, %s, %s, %s)")
-        val = (isbn, user_id, issue, due)
-
-        mycursor.execute(query, val)
-        mydb.commit()
-
-        print(mycursor.rowcount, "Book issued")
+            print("Sorry! Cannot issue a book")
 
     #Accepting a book
-    def acceptBook(self):
+    def acceptBook(self):     
+            
         isbn = int(input("Enter the ISBN of the book : "))
         user_id = str(input("Enter the id of the user :  "))
 
-
-        #Getting and updating count of books available in the database
-        query0 = ("select books_count from books where isbn = %s")
-        val0 = (isbn,)
-        mycursor.execute(query0, val0)
-        myresult = mycursor.fetchall()
-        get_count = myresult[0][0]
-
-        get_count = get_count + 1 
-        query = ("update books set books_count = %s where isbn = %s")
-        val = (get_count,isbn)
-        mycursor.execute(query, val)
-        mydb.commit()
 
         #Calculation of fine
         return_date = datetime.now().date()
@@ -71,18 +93,91 @@ class transaction():
         if return_date > due:
             days = return_date - due
             fine = days.day * 5
-            print("Your fine is :" + fine)
+            print("Your fine is : %d" %fine)
+            
+            #Checks whether user paid the fine or not
+            print("\nDo you want to pay the fine?(y/n)\n")
+            finePaid = str(input())
+            if finePaid == 'y':
+                
+                #Getting and updating count of books available in the database
+                query0 = ("select books_count from books where isbn = %s")
+                val0 = (isbn,)
+                mycursor.execute(query0, val0)
+                myresult = mycursor.fetchall()
+                get_count = myresult[0][0]
+
+                get_count = get_count + 1 
+                query = ("update books set books_count = %s where isbn = %s")
+                val = (get_count,isbn)
+                mycursor.execute(query, val)
+                mydb.commit()
+
+                #Increasing and updating the book count in the user table
+                query0= ("select book_count from user where id = %s")
+                val0 = (user_id,)
+                mycursor.execute(query, val)
+                myresult = mycursor.fetchall()
+                get_count = myresult[0][0]
+
+                get_count = get_count - 1 
+                query = ("update user set book_count = %s where id = %s")
+                val = (get_count, user_id)
+                mycursor.execute(query, val)
+                mydb.commit()
+
+                #Deleting history from database
+                query = ("delete from history where isbn = %s and userid = %s")
+                val = (isbn, user_id)
+
+                mycursor.execute(query, val)
+                mydb.commit()
+
+
+                print(mycursor.rowcount, "Book accepted")
+
+            else:
+                print("Please pay the fine!!")
+
+        #Book returned on time(No Fine)
         else:
             print("Thanks for returning")
         
-        #Deleting history from the database
-        query = ("delete from history where isbn = %s and userid = %s")
-        val = (isbn, user_id)
+            #Getting and updating count of books available in the database
+            query0 = ("select books_count from books where isbn = %s")
+            val0 = (isbn,)
+            mycursor.execute(query0, val0)
+            myresult = mycursor.fetchall()
+            get_count = myresult[0][0]
 
-        mycursor.execute(query, val)
-        mydb.commit()
+            get_count = get_count + 1 
+            query = ("update books set books_count = %s where isbn = %s")
+            val = (get_count,isbn)
+            mycursor.execute(query, val)
+            mydb.commit()
 
-        print(mycursor.rowcount, "Book accepted")
+            #Increasing and updating the book count in the user table
+            query= ("select book_count from user where id = %s")
+            val = (user_id,)
+            mycursor.execute(query, val)
+            myresult = mycursor.fetchall()
+            get_count = myresult[0][0]
+
+            get_count = get_count - 1 
+            query = ("update user set book_count = %s where id = %s")
+            val = (get_count, user_id)
+            mycursor.execute(query, val)
+            mydb.commit()
+
+            #Deleting history from the database
+            query = ("delete from history where isbn = %s and userid = %s")
+            val = (isbn, user_id)
+
+            mycursor.execute(query, val)
+            mydb.commit()
+
+            
+            print(mycursor.rowcount, "Book accepted")
 
 
 # 1&9 Add and Remove a user
@@ -95,9 +190,10 @@ class add_rem_User:
         age = int(input("Enter the age :"))
         phn_no = int(input("Enter phone number : "))
         address = str(input("Enter address : "))
+        book_count = int(input("Enter number of books issued : "))
 
-        query = ("insert into user (id, name, age, phn_no, address) values (%s, %s, %s, %s, %s)")
-        val = (usr_id, name, age, phn_no, address)
+        query = ("insert into user (id, name, age, phn_no, address, book_count) values (%s, %s, %s, %s, %s, %s)")
+        val = (usr_id, name, age, phn_no, address, book_count)
 
         mycursor.execute(query, val)
         mydb.commit()
