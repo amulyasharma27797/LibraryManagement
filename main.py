@@ -1,4 +1,5 @@
 from db import *
+import sys
 
 #Functions for choosing the desired options
 
@@ -52,6 +53,9 @@ def rem_book():
     rem = add_rem_Book()
     rem.remBook()
 
+def end():
+    sys.exit()
+
 #Incorrect Input
 def default():
     print("Incorrect Option")
@@ -66,7 +70,8 @@ options = {
     7:details_books,
     8:details_user, 
     9:rem_user,
-    10:rem_book
+    10:rem_book,
+    11:end
 }
 
 def switch(opt):
@@ -80,16 +85,17 @@ inp = 'y'
 while inp == 'y':
     print("\nWelcome to the Library\n")
 
-    print("1. Add a new user")
-    print("2. Add a new book")
-    print("3. Search for a book")
-    print("4. Issue a book to an existing customer")
-    print("5. Accept returned book from member")
-    print("6. Display issuing history of members")
-    print("7. Display details of books in database")
-    print("8. Display details of users in database")
-    print("9. Remove a user")
+    print("1. {}Add a new user".format(' '))
+    print("2. {}Add a new book".format(' '))
+    print("3. {}Search for a book".format(' '))
+    print("4. {}Issue a book to an existing customer".format(' '))
+    print("5. {}Accept returned book from member".format(' '))
+    print("6. {}Display issuing history of members".format(' '))
+    print("7. {}Display details of books in database".format(' '))
+    print("8. {}Display details of users in database".format(' '))
+    print("9. {}Remove a user".format(' '))
     print("10. Remove a book")
+    print("11. Exit")
    
     #Getting input from the user
     print("\nPress the desired option please :\n")

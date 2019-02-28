@@ -1,9 +1,9 @@
 from datetime import datetime, timedelta
-import mysql.connector
+import mysql.connector as mc
 
 
 #Connecting program and database
-mydb = mysql.connector.connect(host="127.0.0.1", user="root", passwd="password", database="lms")
+mydb = mc.connect(host="127.0.0.1", user="root", passwd="password", database="lms")
 mycursor = mydb.cursor()
 
 
@@ -12,72 +12,75 @@ due = datetime.now().date() + timedelta(days=7)
 
 
 #4 & 5 Issue and Accept a Book
-class transaction():
+class transaction:
 
     #Issuing a book   
     def issueBook(self):
-        print("\nMaximum number of books issued to a user is 5.\n")
+        print("\nMaximum number of books issued to a user can be 5.\n")
         user_id = str(input("Enter the id of the user :  "))
-        
-        query = ("select book_count from user where id = %s")
-        val = (user_id,)
-        mycursor.execute(query, val)
-        myresult = mycursor.fetchall()
-        get_count = myresult[0][0]
-
-        print("\nNumber of books issued to this user is : %d" %get_count)
-
-        #Checks whether user have issued more than 5 books or not
-        if get_count < 5:
-            
-            isbn = int(input("\nEnter the ISBN of the book : "))
-
-            issue = datetime.now().date()
-
-            print()
-            print(str(isbn) + " : " + str(issue))
-            print()
-           
-            #Increasing and updating the book count in the user table
-            query= ("select book_count from user where id = %s")
+        try:
+            query = ("select book_count from user where id = %s")
             val = (user_id,)
             mycursor.execute(query, val)
             myresult = mycursor.fetchall()
             get_count = myresult[0][0]
 
-            get_count = get_count + 1 
-            query = ("update user set book_count = %s where id = %s")
-            val = (get_count, user_id)
-            mycursor.execute(query, val)
-            mydb.commit()
-                        
-            #Getting and updating count of books available in the book table
-            query = ("select books_count from books where isbn = %s")
-            val = (isbn,)
-            mycursor.execute(query, val)
-            myresult = mycursor.fetchall()
-            get_count = myresult[0][0]
-            #print(get_count)
-            if get_count > 0:
-                get_count = get_count - 1 
-                query = ("update books set books_count = %s where isbn = %s")
-                val = (get_count,isbn)
+            print("\nNumber of books issued to this user is : %d" %get_count)
+
+            #Checks whether user have issued more than 5 books or not
+            if get_count < 5:
+                
+                isbn = int(input("\nEnter the ISBN of the book : "))
+
+                issue = datetime.now().date()
+
+                print()
+                print(str(isbn) + " : " + str(issue))
+                print()
+            
+                #Increasing and updating the book count in the user table
+                query= ("select book_count from user where id = %s")
+                val = (user_id,)
+                mycursor.execute(query, val)
+                myresult = mycursor.fetchall()
+                get_count = myresult[0][0]
+
+                get_count = get_count + 1 
+                query = ("update user set book_count = %s where id = %s")
+                val = (get_count, user_id)
                 mycursor.execute(query, val)
                 mydb.commit()
+                            
+                #Getting and updating count of books available in the book table
+                query = ("select books_count from books where isbn = %s")
+                val = (isbn,)
+                mycursor.execute(query, val)
+                myresult = mycursor.fetchall()
+                get_count = myresult[0][0]
+                
+                if get_count > 0:
+                    get_count = get_count - 1 
+                    query = ("update books set books_count = %s where isbn = %s")
+                    val = (get_count,isbn)
+                    mycursor.execute(query, val)
+                    mydb.commit()
+                else:
+                    print("\nBook not available\n")
+
+                #Issuing the book to the user and maintaining the log
+                query = ("insert into history(isbn, userid, issue_date, due_date) values(%s, %s, %s, %s)")
+                val = (isbn, user_id, issue, due)
+
+                mycursor.execute(query, val)
+                mydb.commit()
+
+                print(mycursor.rowcount, "Book issued")
+
             else:
-                print("\nBook not available\n")
+                print("Sorry! Cannot issue a book")
 
-            #Issuing the book to the user and maintaining the log
-            query = ("insert into history(isbn, userid, issue_date, due_date) values(%s, %s, %s, %s)")
-            val = (isbn, user_id, issue, due)
-
-            mycursor.execute(query, val)
-            mydb.commit()
-
-            print(mycursor.rowcount, "Book issued")
-
-        else:
-            print("Sorry! Cannot issue a book")
+        except mc.Error as error:
+            print("\nNo Book Available \n{}".format(error))
 
     #Accepting a book
     def acceptBook(self):     
@@ -89,7 +92,6 @@ class transaction():
         #Calculation of fine
         return_date = datetime.now().date()
         
-        # return_date = datetime.now().date()
         if return_date > due:
             days = return_date - due
             fine = days.day * 5
@@ -126,14 +128,6 @@ class transaction():
                 mycursor.execute(query, val)
                 mydb.commit()
 
-                #Deleting history from database
-                query = ("delete from history where isbn = %s and userid = %s")
-                val = (isbn, user_id)
-
-                mycursor.execute(query, val)
-                mydb.commit()
-
-
                 print(mycursor.rowcount, "Book accepted")
 
             else:
@@ -169,36 +163,30 @@ class transaction():
             mycursor.execute(query, val)
             mydb.commit()
 
-            #Deleting history from the database
-            query = ("delete from history where isbn = %s and userid = %s")
-            val = (isbn, user_id)
-
-            mycursor.execute(query, val)
-            mydb.commit()
-
-            
-            print(mycursor.rowcount, "Book accepted")
-
 
 # 1&9 Add and Remove a user
 class add_rem_User:
     
     #1. Function for adding a user 
     def addUser(self):
-        usr_id = int(input("Enter id :"))
-        name = str(input("Enter the name :"))
-        age = int(input("Enter the age :"))
-        phn_no = int(input("Enter phone number : "))
-        address = str(input("Enter address : "))
-        book_count = int(input("Enter number of books issued : "))
+        try:
+            usr_id = int(input("Enter id :"))
+            name = str(input("Enter the name :"))
+            age = int(input("Enter the age :"))
+            phn_no = int(input("Enter phone number : "))
+            address = str(input("Enter address : "))
+            book_count = int(input("Enter number of books issued : "))
 
-        query = ("insert into user (id, name, age, phn_no, address, book_count) values (%s, %s, %s, %s, %s, %s)")
-        val = (usr_id, name, age, phn_no, address, book_count)
+            query = ("insert into user (id, name, age, phn_no, address, book_count) values (%s, %s, %s, %s, %s, %s)")
+            val = (usr_id, name, age, phn_no, address, book_count)
 
-        mycursor.execute(query, val)
-        mydb.commit()
+            mycursor.execute(query, val)
+            mydb.commit()
 
-        print(mycursor.rowcount, "New user added")
+            print(mycursor.rowcount, "New user added")
+        
+        except mc.Error as error:
+            print("\nUser already exists \n{}".format(error))
 
     #9. Function for removing a user
     def remUser(self):
@@ -212,6 +200,7 @@ class add_rem_User:
         mydb.commit()
         
         print(mycursor.rowcount, "User deleted")
+
 
 
 
@@ -258,7 +247,7 @@ class display:
         
         #Searching by book name
         def book_name():
-            bookName = str(input("Enter the name of the book : "))
+            bookName = str(input("\nEnter the name of the book : \n"))
             query = ("select * from books where name = %s")
             val = (bookName,)
 
@@ -270,7 +259,7 @@ class display:
 
         #Searching through ISBN
         def isbn():
-            number = int(input("Enter the isbn number :"))
+            number = int(input("\nEnter the isbn number :\n"))
             query = ("select * from books where isbn = %s")
             val = (number,)
 
@@ -282,7 +271,7 @@ class display:
 
         #Searching by author's name
         def author():
-            author_name = str(input("Enter the name of author : "))
+            author_name = str(input("\nEnter the name of author : \n"))
             query = ("select * from books where author = %s")
             val = (author_name,)
 
@@ -294,7 +283,7 @@ class display:
 
         #Incorrect Input
         def default():
-            print("Enter a valid option please")
+            print("\nEnter a valid option please\n")
 
         #Dict used for search referencing
         book_dict = {1:book_name, 2:isbn, 3:author}
@@ -304,9 +293,9 @@ class display:
             opt = book_dict.get(get_inp, default)
             opt()
 
-        print("Search a Book\n")
+        print("\nSearch a Book\n")
         print("1. Search by Book Name")
-        print("2. Search by ISBN\n")
+        print("2. Search by ISBN")
         print("3. Search by Author\n")
         print("Enter your choice : \n")
 
@@ -316,10 +305,12 @@ class display:
 
     #6. Function for getting history of all members in the databse
     def get_hist(self):
+
+        print("\nISBN, User ID, Issue Date, Due Date\n")
+
         mycursor.execute("select * from history")
 
         myresult = mycursor.fetchall()
-
         for user in myresult:
             print(user)
 
@@ -341,6 +332,8 @@ class display:
         mycursor.execute("select * from user")
 
         myresult = mycursor.fetchall()
+
+        print("\nId, Name, Age, Ph. No., Address, Book Count\n")
 
         for user in myresult:
             print(user)
