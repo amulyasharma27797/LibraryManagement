@@ -3,7 +3,7 @@ import mysql.connector as mc
 
 
 #Connecting program and database
-mydb = mc.connect(host="127.0.0.1", user="root", passwd="password", database="lms")
+mydb = mc.connect(host="127.0.0.1", user="root", passwd="password", database="lms1")
 mycursor = mydb.cursor()
 
 
