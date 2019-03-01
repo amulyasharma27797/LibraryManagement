@@ -83,6 +83,7 @@ def switch(opt):
 
 inp = 'y'
 while inp == 'y':
+    print("*"*150)
     print("\nWelcome to the Library\n")
 
     print("1. {}Add a new user".format(' '))
@@ -95,11 +96,14 @@ while inp == 'y':
     print("8. {}Display details of users in database".format(' '))
     print("9. {}Remove a user".format(' '))
     print("10. Remove a book")
-    print("11. Exit")
+    print("11. Exit\n")
+    print("*"*150)
    
     #Getting input from the user
     print("\nPress the desired option please :\n")
 
     opt = int(input())
     switch(opt)
+    print("*"*150)
     inp = input("Do you wish to continue? (y/n) : ")
+    print("*"*150)

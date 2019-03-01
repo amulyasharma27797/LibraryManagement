@@ -293,12 +293,13 @@ class display:
             opt = book_dict.get(get_inp, default)
             opt()
 
+        print("*"*150)
         print("\nSearch a Book\n")
         print("1. Search by Book Name")
         print("2. Search by ISBN")
         print("3. Search by Author\n")
         print("Enter your choice : \n")
-
+        print("*"*150)
 
         get_inp = int(input())
         switch(get_inp)
